@@ -68,6 +68,15 @@ production deploy drops the `/staging/` folder.
    gh api -X POST repos/RealViewExtension/website/pages -f build_type=workflow
    ```
 3. Push `main`. The first run creates the `github-pages` environment and publishes the site.
+4. Allow the `staging` branch to deploy. GitHub creates the environment with a branch policy
+   that only permits `main`, so the first staging run fails at the Publish step until you add it:
+
+   ```sh
+   gh api -X POST repos/RealViewExtension/website/environments/github-pages/deployment-branch-policies \
+     -f name=staging -f type=branch
+   ```
+
+   Or Settings → Environments → github-pages → Deployment branches → add `staging`.
 
 If you later rename the repository to `realviewextension.github.io`, the site moves to the root
 of that domain. The workflow works out the base path from the repository name, so nothing in the
