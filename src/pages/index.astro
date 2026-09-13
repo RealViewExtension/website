@@ -65,9 +65,9 @@ const switches = [
         <span class="eyebrow">Chrome extension for YouTube Studio</span>
         <h1>See the views that <span class="accent">count</span>.</h1>
         <p class="lede">
-          In 2025 YouTube started counting a view the instant playback begins. RealView puts the
-          old 30-second <strong>engaged view</strong> back on every screen in Studio, and paints the
-          charts red so you always know which figure you are looking at.
+          Since August 24, 2026, YouTube counts a view from the first frame of playback. RealView
+          puts the old 30-second <strong>engaged view</strong> back on every screen in Studio, and
+          paints the charts red so you always know which figure you are looking at.
         </p>
         <div class="actions">
           {WEB_STORE_URL ? (
@@ -90,7 +90,7 @@ const switches = [
         </p>
       </div>
       <div class="hero-demo" aria-label="Studio's Views card before and after RealView">
-        <StudioCard caption="Studio today" label="Views" value="60" compare="Counted at playback start" color="blue" />
+        <StudioCard caption="Studio today" label="Views" value="60" compare="Counted from the first frame" color="blue" />
         <StudioCard caption="With RealView" label="Engaged views" value="47" compare="Counted after 30 seconds" color="red" />
       </div>
     </div>
@@ -102,8 +102,13 @@ const switches = [
         <span class="eyebrow">Why</span>
         <h2>The number went up. Your audience did not.</h2>
         <p>
-          The old definition of a view survives in YouTube’s analytics API under the name <code>ENGAGED_VIEWS</code>, but Studio leads with the new one everywhere. The gap is real,
-          and biggest exactly where you look most often: the last week.
+          On August 24, 2026 YouTube changed what a public view means: it is now counted the
+          moment a video starts playing, the way Shorts have been counted since 2025. The old,
+          stricter definition was renamed <strong>engaged views</strong> and survives in the
+          analytics API as <code>ENGAGED_VIEWS</code>, but Studio leads with the new figure
+          everywhere. Earnings and Partner Program eligibility still run on the engaged figures,
+          so the number that matters is the one Studio now hides. The gap is real, and biggest
+          exactly where you look most often: the last week.
         </p>
         <p>
           RealView asks YouTube’s own analytics service for the engaged figures over exactly the
