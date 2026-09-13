@@ -1,0 +1,104 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { LATEST_ZIP_URL, releaseUrl, url, formatDate, sortUpdates } from '../../lib/site';
+
+const updates = sortUpdates(await getCollection('updates'));
+const rendered = await Promise.all(
+  updates.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
+---
+
+<Base title="Updates" description="Every RealView release, newest first: what changed and what you will see differently in YouTube Studio.">
+  <section class="section">
+    <div class="wrap">
+      <span class="eyebrow">Updates</span>
+      <h1>What changed</h1>
+      <p class="lede">
+        Every release, newest first. RealView tells you inside Studio when it has updated; this page
+        is the same list, in one place. <a href={url('rss.xml')}>Subscribe by RSS</a> or <a href={LATEST_ZIP_URL} rel="noopener">download the latest version</a>.
+      </p>
+
+      <ol class="timeline">
+        {rendered.map(({ entry, Content }) => (
+          <li id={entry.data.version} class="release">
+            <div class="meta">
+              <a class="version" href={url(`updates/${entry.data.version}/`)}>{entry.data.version}</a>
+              <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+              <span class:list={['badge', entry.data.kind]}>{entry.data.kind}</span>
+            </div>
+            <div class="body prose">
+              <h2>{entry.data.title}</h2>
+              <Content />
+              <p class="links">
+                <a href={releaseUrl(entry.data.version)} rel="noopener">Release on GitHub</a>
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 3rem 0 0;
+  }
+  .release {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 80px;
+  }
+  .release:target .version {
+    background: var(--red);
+    color: #fff;
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+  }
+  .version {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--fg);
+    text-decoration: none;
+    padding: 0.15em 0.55em;
+    border-radius: 6px;
+    background: var(--bg-sunken);
+    border: 1px solid var(--line);
+  }
+  .body h2 {
+    font-size: 1.35rem;
+    margin-bottom: 0.6rem;
+  }
+  .body :global(ul) {
+    margin-top: 0;
+    list-style: disc;
+  }
+  .links {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+  @media (max-width: 640px) {
+    .release {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+    .meta {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+  }
+</style>

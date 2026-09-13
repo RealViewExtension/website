@@ -1,0 +1,29 @@
+# Runs on every pull request: the site must build cleanly before it can be
+# merged into staging or main. Nothing is deployed from here.
+
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main, staging]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          SITE_URL: https://example.invalid
+          BASE_PATH: /website
+          PUBLIC_DEPLOY_ENV: staging

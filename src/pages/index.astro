@@ -1,0 +1,438 @@
+---
+import Base from '../layouts/Base.astro';
+import StudioCard from '../components/StudioCard.astro';
+import { getCollection } from 'astro:content';
+import {
+  EXTENSION_REPO,
+  LATEST_ZIP_URL,
+  PRIVACY_URL,
+  WEB_STORE_URL,
+  MIN_CHROME,
+  url,
+  formatDate,
+  sortUpdates,
+} from '../lib/site';
+
+const updates = sortUpdates(await getCollection('updates'));
+const latest = updates[0];
+
+const covers = [
+  {
+    title: 'Analytics',
+    text: 'The headline card, its comparison figure and daily chart, the summary sentence and every table’s view column. Channel, video and playlist scopes.',
+  },
+  {
+    title: 'Realtime',
+    text: 'The 48-hour card with its hourly chart and top-videos table, queried over exactly the hours the card draws.',
+  },
+  {
+    title: 'Dashboard',
+    text: 'The channel summary card, top content, and the latest-video card with its “6 of 10” ranking rebuilt and reordered by engaged views.',
+  },
+  {
+    title: 'Content tab',
+    text: 'Lifetime view counts in the video list, looked up per video.',
+  },
+  {
+    title: 'Breakdowns',
+    text: 'Traffic sources, geography, devices, age and gender, subtitle languages, interests. Two-way splits and the All, Videos, Shorts and Live tabs each get their own figures.',
+  },
+  {
+    title: 'Charts',
+    text: 'Every converted chart is painted red so you always know which figure you are looking at. Turn the red off and the numbers stay engaged.',
+  },
+];
+
+const ranges = [
+  { range: '7 days', raw: 24, engaged: 11 },
+  { range: '28 days', raw: 60, engaged: 47 },
+  { range: '365 days', raw: 953, engaged: 938 },
+];
+
+const switches = [
+  ['Use engaged views', 'The main switch. Off, and Studio behaves exactly as it normally does.'],
+  ['Red charts', 'Chart colour. Only applies while engaged views are being shown.'],
+  ['Update notice on Studio', 'The small card that appears once after an update. Off, and only the toolbar badge tells you.'],
+  ['Log to the console', 'For diagnosing a problem. Leave it off for normal use.'],
+];
+---
+
+<Base>
+  <section class="hero section">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">Chrome extension for YouTube Studio</span>
+        <h1>See the views that <span class="accent">count</span>.</h1>
+        <p class="lede">
+          In 2025 YouTube started counting a view the instant playback begins. RealView puts the
+          old 30-second <strong>engaged view</strong> back on every screen in Studio, and paints the
+          charts red so you always know which figure you are looking at.
+        </p>
+        <div class="actions">
+          {WEB_STORE_URL ? (
+            <a class="btn primary" href={WEB_STORE_URL} rel="noopener">Add to Chrome</a>
+          ) : (
+            <a class="btn primary" href={LATEST_ZIP_URL} rel="noopener">Download for Chrome</a>
+          )}
+          <a class="btn" href="#install">How to install</a>
+        </div>
+        <p class="fineprint muted">
+          {WEB_STORE_URL
+            ? 'Also available as a zip from GitHub.'
+            : 'Chrome Web Store listing is under review. Until then, install from the zip in one minute.'}
+          {latest && (
+            <>
+              {' '}Latest version <a href={url('updates/')}>{latest.data.version}</a>, released{' '}
+              {formatDate(latest.data.date)}.
+            </>
+          )}
+        </p>
+      </div>
+      <div class="hero-demo" aria-label="Studio's Views card before and after RealView">
+        <StudioCard caption="Studio today" label="Views" value="60" compare="Counted at playback start" color="blue" />
+        <StudioCard caption="With RealView" label="Engaged views" value="47" compare="Counted after 30 seconds" color="red" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="why">
+    <div class="wrap two-col">
+      <div class="prose">
+        <span class="eyebrow">Why</span>
+        <h2>The number went up. Your audience did not.</h2>
+        <p>
+          The old definition of a view survives in YouTube’s analytics API under the name <code>ENGAGED_VIEWS</code>, but Studio leads with the new one everywhere. The gap is real,
+          and biggest exactly where you look most often: the last week.
+        </p>
+        <p>
+          RealView asks YouTube’s own analytics service for the engaged figures over exactly the
+          same dates, and shows them in place of the raw ones. The number will be lower. That is
+          the whole point: it leaves out everyone who clicked away within the first few seconds.
+        </p>
+      </div>
+      <table class="ranges card">
+        <caption class="sr-only">Raw views against engaged views on the channel RealView was built against</caption>
+        <thead>
+          <tr><th scope="col">Range</th><th scope="col">Views</th><th scope="col">Engaged</th></tr>
+        </thead>
+        <tbody>
+          {ranges.map((r) => (
+            <tr>
+              <th scope="row">{r.range}</th>
+              <td class="raw">{r.raw}</td>
+              <td class="engaged">{r.engaged}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="covers">
+    <div class="wrap">
+      <span class="eyebrow">Coverage</span>
+      <h2>Everywhere Studio shows views.</h2>
+      <p class="lede">
+        A screen is only relabelled once every figure on it has really been converted, so a raw
+        count is never captioned as an engaged one.
+      </p>
+      <div class="grid covers">
+        {covers.map((c) => (
+          <div class="card">
+            <h3>{c.title}</h3>
+            <p class="muted">{c.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <span class="eyebrow">How it works</span>
+      <h2>Same service, same dates, different metric.</h2>
+      <ol class="steps">
+        <li>
+          <strong>Studio asks for its data.</strong>
+          <span>Every card in Studio loads its figures from YouTube’s analytics service, and those figures are raw views.</span>
+        </li>
+        <li>
+          <strong>RealView asks the same question again.</strong>
+          <span>One extra request per screen, for the engaged metric over exactly the same dates, using the session you are already signed in with.</span>
+        </li>
+        <li>
+          <strong>The numbers are swapped in place.</strong>
+          <span>Only the figures change. Column names stay as Studio configured them, so nothing breaks, and the wording on the page is corrected once the numbers really did.</span>
+        </li>
+      </ol>
+      <p class="muted">
+        Curious about the details? The <a href={`${EXTENSION_REPO}#how-it-works`} rel="noopener">README</a> walks through every endpoint and edge case.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="privacy">
+    <div class="wrap two-col">
+      <div class="prose">
+        <span class="eyebrow">Privacy</span>
+        <h2>Nothing leaves your browser.</h2>
+        <p>
+          RealView runs only on <code>studio.youtube.com</code> and asks for a single permission:
+          storage, to remember its four switches. The engaged figures are held in memory and never
+          written to disk. No servers, no accounts, no analytics of its own.
+        </p>
+        <p>
+          Your channel is not modified. RealView changes what Studio shows <em>you</em>. Nobody else
+          sees anything different, and turning the main switch off puts Studio back exactly as it
+          was.
+        </p>
+        <p><a href={PRIVACY_URL} rel="noopener">Read the privacy policy</a></p>
+      </div>
+      <ul class="checks card">
+        <li>Runs only on studio.youtube.com</li>
+        <li>One permission: storage</li>
+        <li>No data sent anywhere</li>
+        <li>Figures kept in memory only</li>
+        <li>Open source, MIT licence</li>
+        <li>Off switch restores Studio instantly</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="wrap two-col">
+      <div class="prose">
+        <span class="eyebrow">Install</span>
+        <h2>One minute, no build step.</h2>
+        <p class="muted">Needs Google Chrome {MIN_CHROME} or newer.</p>
+        <ol class="install">
+          <li>
+            <a href={LATEST_ZIP_URL} rel="noopener">Download the zip</a> and unzip it. Put the <code>RealView-extension</code> folder somewhere permanent, such as Documents. Chrome loads it from there every time it starts.
+          </li>
+          <li>Open <code>chrome://extensions</code> and turn on <strong>Developer mode</strong>, top right.</li>
+          <li>Click <strong>Load unpacked</strong> and choose the <code>RealView-extension</code> folder itself.</li>
+          <li>
+            Open <a href="https://studio.youtube.com" rel="noopener">studio.youtube.com</a> and go to
+            Analytics. The main card now reads <strong>Engaged views</strong> and the graph is red.
+          </li>
+        </ol>
+        <p class="muted">
+          Chrome shows a “Disable developer mode extensions” notice at startup for any
+          extension installed this way. Dismiss it. RealView keeps working.
+        </p>
+      </div>
+      <div class="card popup">
+        <h3>Four switches</h3>
+        <p class="muted small">Click the RealView icon in the toolbar.</p>
+        {switches.map(([name, text], i) => (
+          <label class="switch">
+            <input type="checkbox" checked={i < 3} disabled />
+            <span><strong>{name}</strong><span class="muted">{text}</span></span>
+          </label>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta">
+    <div class="wrap">
+      <h2>Get the real number back.</h2>
+      <div class="actions">
+        <a class="btn primary" href={WEB_STORE_URL || LATEST_ZIP_URL} rel="noopener">
+          {WEB_STORE_URL ? 'Add to Chrome' : 'Download for Chrome'}
+        </a>
+        <a class="btn" href={url('updates/')}>What’s new</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(3rem, 9vw, 7rem);
+    background:
+      radial-gradient(60% 50% at 80% 20%, var(--red-soft), transparent 70%),
+      var(--bg);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .accent {
+    color: var(--red);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.6rem 0 1rem;
+  }
+  .fineprint {
+    font-size: 0.9rem;
+    max-width: 48ch;
+  }
+  .hero-demo {
+    display: grid;
+    gap: 1rem;
+  }
+  .hero-demo :global(.studio-card.blue) {
+    opacity: 0.7;
+    transform: scale(0.96);
+    transform-origin: right center;
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+  .ranges {
+    border-collapse: collapse;
+    width: 100%;
+    font-variant-numeric: tabular-nums;
+    padding: 0.5rem 1rem;
+  }
+  .ranges th,
+  .ranges td {
+    text-align: left;
+    padding: 0.75rem 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .ranges thead th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-muted);
+  }
+  .ranges tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  .ranges td {
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+  .raw {
+    color: var(--fg-muted);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .engaged {
+    color: var(--red);
+  }
+  .covers {
+    margin-top: 2rem;
+  }
+  .covers h3 {
+    margin-bottom: 0.35rem;
+  }
+  .covers p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    padding: 0;
+    margin: 2rem 0 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .steps li {
+    counter-increment: step;
+    display: grid;
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--red);
+  }
+  .steps li::before {
+    content: '0' counter(step);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--red);
+  }
+  .steps span {
+    color: var(--fg-muted);
+    font-size: 0.97rem;
+  }
+  .checks {
+    list-style: none;
+    padding: 1rem 1.4rem;
+    margin: 0;
+  }
+  .checks li {
+    padding: 0.55rem 0 0.55rem 1.8rem;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+  .checks li:last-child {
+    border-bottom: 0;
+  }
+  .checks li::before {
+    content: '';
+    position: absolute;
+    left: 0.2rem;
+    top: 0.95rem;
+    width: 0.55rem;
+    height: 0.3rem;
+    border-left: 2.5px solid var(--red);
+    border-bottom: 2.5px solid var(--red);
+    transform: rotate(-45deg);
+  }
+  .install {
+    padding-left: 1.3em;
+  }
+  .install li + li {
+    margin-top: 0.7em;
+  }
+  .popup {
+    max-width: 340px;
+    font-size: 0.92rem;
+  }
+  .popup h3 {
+    margin-bottom: 0.2rem;
+  }
+  .small {
+    font-size: 0.85rem;
+  }
+  .switch {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--line);
+    align-items: flex-start;
+  }
+  .switch input {
+    margin-top: 0.25rem;
+    accent-color: var(--red);
+  }
+  .switch > span {
+    display: grid;
+  }
+  .switch strong {
+    font-weight: 500;
+  }
+  .switch .muted {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+  .cta {
+    text-align: center;
+    background: var(--bg-sunken);
+  }
+  .cta .actions {
+    justify-content: center;
+  }
+  @media (max-width: 800px) {
+    .hero-grid,
+    .two-col {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .hero-demo :global(.studio-card.blue) {
+      transform: none;
+    }
+  }
+</style>

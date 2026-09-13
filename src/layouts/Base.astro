@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_NAME, TAGLINE, IS_STAGING, url } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = 'RealView is a free Chrome extension that shows engaged views, the old 30-second view count, everywhere in YouTube Studio, and paints the charts red.' } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · ${TAGLINE}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(url('icon128.png'), Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={url('icon48.png')} sizes="48x48" type="image/png" />
+    <link rel="apple-touch-icon" href={url('icon128.png')} />
+    <link rel="alternate" type="application/rss+xml" title="RealView updates" href={url('rss.xml')} />
+    <meta name="theme-color" content="#ff0033" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary" />
+    {IS_STAGING && <meta name="robots" content="noindex, nofollow" />}
+  </head>
+  <body>
+    {IS_STAGING && (
+      <div class="staging" role="status">
+        Staging preview. This is not the live site.
+      </div>
+    )}
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .staging {
+    background: repeating-linear-gradient(-45deg, #ffb300 0 12px, #1a1a1a 12px 24px);
+    color: #fff;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+</style>

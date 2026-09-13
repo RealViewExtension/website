@@ -1,0 +1,142 @@
+# Builds and publishes the site to GitHub Pages.
+#
+#   main branch     -> https://<owner>.github.io/<repo>/
+#   staging branch  -> https://<owner>.github.io/<repo>/staging/
+#
+# GitHub Pages serves one site per repository, so both live in the same
+# deployment: every run rebuilds production from `main` and staging from
+# `staging`, then publishes the two together. Pushing to either branch is
+# enough. Staging pages carry a noindex tag and a banner.
+#
+# One-time setup: Settings -> Pages -> Source: "GitHub Actions".
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 22
+
+jobs:
+  build:
+    name: Build production + staging
+    runs-on: ubuntu-latest
+    outputs:
+      site_url: ${{ steps.paths.outputs.site_url }}
+      base_path: ${{ steps.paths.outputs.base_path }}
+    steps:
+      - name: Work out the Pages URL for this repository
+        id: paths
+        shell: bash
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          site_url="https://${owner}.github.io"
+          # A repository named <owner>.github.io is served from the root.
+          if [[ "${repo,,}" == "${owner}.github.io" ]]; then
+            base_path="/"
+          else
+            base_path="/${repo}"
+          fi
+          echo "site_url=${site_url}" >> "$GITHUB_OUTPUT"
+          echo "base_path=${base_path}" >> "$GITHUB_OUTPUT"
+          echo "Production: ${site_url}${base_path%/}/"
+          echo "Staging:    ${site_url}${base_path%/}/staging/"
+
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Does a staging branch exist?
+        id: staging
+        shell: bash
+        working-directory: main
+        run: |
+          if git ls-remote --exit-code --heads origin staging >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No staging branch; only production will be built."
+          fi
+
+      - name: Check out staging
+        if: steps.staging.outputs.exists == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+          path: staging
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: main/package-lock.json
+
+      - name: Build production (main)
+        working-directory: main
+        env:
+          SITE_URL: ${{ steps.paths.outputs.site_url }}
+          BASE_PATH: ${{ steps.paths.outputs.base_path }}
+          PUBLIC_DEPLOY_ENV: production
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build staging (staging)
+        if: steps.staging.outputs.exists == 'true'
+        working-directory: staging
+        env:
+          SITE_URL: ${{ steps.paths.outputs.site_url }}
+          BASE_PATH: ${{ steps.paths.outputs.base_path == '/' && '/staging' || format('{0}/staging', steps.paths.outputs.base_path) }}
+          PUBLIC_DEPLOY_ENV: staging
+        run: |
+          npm ci
+          npm run build
+          rm -rf ../main/dist/staging
+          mv dist ../main/dist/staging
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: main/dist
+
+  deploy:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Where to look
+        shell: bash
+        run: |
+          base="${{ needs.build.outputs.base_path }}"
+          site="${{ needs.build.outputs.site_url }}${base%/}"
+          {
+            echo "### Deployed"
+            echo
+            echo "| Environment | URL |"
+            echo "| --- | --- |"
+            echo "| Production (main) | ${site}/ |"
+            echo "| Staging (staging) | ${site}/staging/ |"
+          } >> "$GITHUB_STEP_SUMMARY"

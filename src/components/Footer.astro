@@ -1,0 +1,60 @@
+---
+import { EXTENSION_REPO, PRIVACY_URL, ISSUES_URL, RELEASES_URL, url } from '../lib/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <strong>RealView</strong>
+        <p class="muted small">
+          Engaged views for YouTube Studio. Free and open source under the MIT licence.
+          Not affiliated with YouTube or Google.
+        </p>
+      </div>
+      <nav aria-label="Footer">
+        <a href={url('updates/')}>Updates</a>
+        <a href={url('rss.xml')}>RSS feed</a>
+        <a href={RELEASES_URL} rel="noopener">All releases</a>
+        <a href={PRIVACY_URL} rel="noopener">Privacy policy</a>
+        <a href={ISSUES_URL} rel="noopener">Report a problem</a>
+        <a href={EXTENSION_REPO} rel="noopener">Source on GitHub</a>
+      </nav>
+    </div>
+    <p class="muted small">© {year} Eric Farrell.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding-block: 2.5rem;
+    background: var(--bg-sunken);
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+    font-size: 0.95rem;
+    align-content: start;
+  }
+  nav a {
+    text-decoration: none;
+  }
+  .small {
+    font-size: 0.9rem;
+    max-width: 40ch;
+  }
+  @media (max-width: 640px) {
+    .cols {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import { EXTENSION_REPO, url, sortUpdates } from '../lib/site';
+
+const latest = sortUpdates(await getCollection('updates'))[0];
+const path = Astro.url.pathname;
+const onUpdates = path.includes('/updates');
+---
+
+<header class="site-header">
+  <div class="wrap row">
+    <a class="brand" href={url()}>
+      <img src={url('icon48.png')} alt="" width="28" height="28" />
+      <span>RealView</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href={url('updates/')} aria-current={onUpdates ? 'page' : undefined}>
+        Updates
+        {latest && <span class="version">v{latest.data.version}</span>}
+      </a>
+      <a href={EXTENSION_REPO} rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    border-bottom: 1px solid var(--line);
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    gap: 1rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-decoration: none;
+  }
+  .brand img {
+    border-radius: 7px;
+  }
+  nav {
+    display: flex;
+    gap: 1.4rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  nav a {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  nav a[aria-current='page'] {
+    color: var(--red);
+  }
+  .version {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.1em 0.5em;
+    border-radius: 999px;
+    background: var(--red-soft);
+    color: var(--red);
+  }
+</style>

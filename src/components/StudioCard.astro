@@ -1,0 +1,97 @@
+---
+// A mock of Studio's key-metric card, drawn twice: once as Studio ships it
+// and once as RealView shows it. Pure HTML and SVG, no screenshot needed.
+interface Props {
+  label: string;
+  value: string;
+  compare: string;
+  color: 'blue' | 'red';
+  caption: string;
+}
+const { label, value, compare, color, caption } = Astro.props;
+const stroke = color === 'red' ? 'var(--red)' : 'var(--blue)';
+// Same curve for both; only the scale and colour differ.
+const line = 'M0,44 C20,40 30,46 45,36 S70,20 90,26 S120,12 140,18 S170,8 200,10';
+const area = `${line} L200,60 L0,60 Z`;
+---
+
+<figure class:list={['studio-card', color]}>
+  <figcaption class="caption">{caption}</figcaption>
+  <div class="head">
+    <span class="label">{label}</span>
+    <span class="range">Last 28 days</span>
+  </div>
+  <div class="value">{value}</div>
+  <div class="compare">{compare}</div>
+  <svg viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id={`fade-${color}`} x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color={stroke} stop-opacity="0.28" />
+        <stop offset="1" stop-color={stroke} stop-opacity="0" />
+      </linearGradient>
+    </defs>
+    <path d={area} fill={`url(#fade-${color})`} />
+    <path d={line} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="200" cy="10" r="3.2" fill={stroke} />
+  </svg>
+</figure>
+
+<style>
+  .studio-card {
+    margin: 0;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem 0.6rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .studio-card.red {
+    border-color: color-mix(in srgb, var(--red) 55%, var(--line));
+    box-shadow: 0 8px 30px rgba(255, 0, 51, 0.18);
+  }
+  .caption {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 0.6rem;
+  }
+  .red .caption {
+    color: var(--red);
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .label {
+    font-weight: 600;
+  }
+  .range {
+    font-size: 0.78rem;
+    color: var(--fg-muted);
+  }
+  .value {
+    font-size: 2.6rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .compare {
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    margin-bottom: 0.4rem;
+  }
+  svg {
+    width: 100%;
+    height: 64px;
+    display: block;
+  }
+</style>
