@@ -1,7 +1,10 @@
 # Builds and publishes the site to GitHub Pages.
 #
-#   main branch     -> https://<owner>.github.io/<repo>/
-#   staging branch  -> https://<owner>.github.io/<repo>/staging/
+#   main branch     -> https://tryrealview.com/          (from public/CNAME)
+#   staging branch  -> https://tryrealview.com/staging/
+#
+# Without a public/CNAME file the site falls back to
+# https://<owner>.github.io/<repo>/ and /staging/ under it.
 #
 # GitHub Pages serves one site per repository, so both live in the same
 # deployment: every run rebuilds production from `main` and staging from
@@ -37,29 +40,36 @@ jobs:
       site_url: ${{ steps.paths.outputs.site_url }}
       base_path: ${{ steps.paths.outputs.base_path }}
     steps:
+      - name: Check out main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          path: main
+
       - name: Work out the Pages URL for this repository
         id: paths
         shell: bash
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
           repo="${GITHUB_REPOSITORY#*/}"
-          site_url="https://${owner}.github.io"
-          # A repository named <owner>.github.io is served from the root.
-          if [[ "${repo,,}" == "${owner}.github.io" ]]; then
+          cname_file="${GITHUB_WORKSPACE}/main/public/CNAME"
+          if [[ -s "$cname_file" ]]; then
+            # A custom domain serves the site from the root of that domain.
+            domain="$(head -n1 "$cname_file" | tr -d '[:space:]')"
+            site_url="https://${domain}"
+            base_path="/"
+          elif [[ "${repo,,}" == "${owner}.github.io" ]]; then
+            # A repository named <owner>.github.io is served from the root.
+            site_url="https://${owner}.github.io"
             base_path="/"
           else
+            site_url="https://${owner}.github.io"
             base_path="/${repo}"
           fi
           echo "site_url=${site_url}" >> "$GITHUB_OUTPUT"
           echo "base_path=${base_path}" >> "$GITHUB_OUTPUT"
           echo "Production: ${site_url}${base_path%/}/"
           echo "Staging:    ${site_url}${base_path%/}/staging/"
-
-      - name: Check out main
-        uses: actions/checkout@v7
-        with:
-          ref: main
-          path: main
 
       - name: Does a staging branch exist?
         id: staging

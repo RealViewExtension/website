@@ -6,8 +6,8 @@ the Chrome extension that shows engaged views in YouTube Studio. Built with
 
 | Environment | Branch    | URL                                                    |
 | ----------- | --------- | ------------------------------------------------------ |
-| Production  | `main`    | https://realviewextension.github.io/website/           |
-| Staging     | `staging` | https://realviewextension.github.io/website/staging/   |
+| Production  | `main`    | https://tryrealview.com/          |
+| Staging     | `staging` | https://tryrealview.com/staging/  |
 
 ## Publishing an update
 
@@ -78,9 +78,29 @@ production deploy drops the `/staging/` folder.
 
    Or Settings → Environments → github-pages → Deployment branches → add `staging`.
 
-If you later rename the repository to `realviewextension.github.io`, the site moves to the root
-of that domain. The workflow works out the base path from the repository name, so nothing in the
-code changes.
+## Custom domain
+
+The site is served from `tryrealview.com`, set by `public/CNAME`. The deploy workflow reads that
+file: when it exists the site is built for the root of that domain, and when it is removed the
+site goes back to `https://realviewextension.github.io/website/`. The same domain must also be set
+under Settings → Pages → Custom domain.
+
+DNS is on Cloudflare. Records, all set to **DNS only** (grey cloud):
+
+| Type  | Name  | Content                     |
+| ----- | ----- | --------------------------- |
+| A     | `@`   | `185.199.108.153`           |
+| A     | `@`   | `185.199.109.153`           |
+| A     | `@`   | `185.199.110.153`           |
+| A     | `@`   | `185.199.111.153`           |
+| AAAA  | `@`   | `2606:50c0:8000::153`       |
+| AAAA  | `@`   | `2606:50c0:8001::153`       |
+| AAAA  | `@`   | `2606:50c0:8002::153`       |
+| AAAA  | `@`   | `2606:50c0:8003::153`       |
+| CNAME | `www` | `realviewextension.github.io` |
+
+Keep them grey-clouded. GitHub issues the HTTPS certificate itself and cannot do so while
+Cloudflare proxies the traffic.
 
 ## Local development
 
