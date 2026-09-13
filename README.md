@@ -93,7 +93,7 @@ npm run preview    # serve dist/ locally
 
 Things you may want to change:
 
-- `src/lib/site.ts`: the GitHub links, and `WEB_STORE_URL` once the Chrome Web Store listing is
-  approved. Setting it swaps the download button for "Add to Chrome".
+- `src/lib/site.ts`: the Chrome Web Store link and the GitHub links. The store link is the main
+  install button; the GitHub release zip is offered as an early access build.
 - `src/pages/index.astro`: the landing page copy and the example figures.
 - `src/styles/global.css`: colours and type. The red is `#ff0033`, the same as the charts.

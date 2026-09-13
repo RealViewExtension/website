@@ -7,9 +7,9 @@ export const LATEST_ZIP_URL = `${EXTENSION_REPO}/releases/latest/download/RealVi
 export const PRIVACY_URL = `${EXTENSION_REPO}/blob/main/PRIVACY.md`;
 export const ISSUES_URL = `${EXTENSION_REPO}/issues`;
 
-// Fill in once the Chrome Web Store listing is approved. Empty string hides
-// the install button and shows the "under review" note instead.
-export const WEB_STORE_URL = '';
+// The public listing. Leave empty to fall back to the GitHub zip everywhere.
+export const WEB_STORE_URL =
+  'https://chromewebstore.google.com/detail/realview-engaged-views-fo/nagdbmdfcaofcfgmaflmflbcbbfdddjo';
 
 export const MIN_CHROME = 111;
 

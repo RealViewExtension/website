@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
-import { LATEST_ZIP_URL, releaseUrl, url, formatDate, sortUpdates } from '../../lib/site';
+import { WEB_STORE_URL, releaseUrl, url, formatDate, sortUpdates } from '../../lib/site';
 
 const updates = sortUpdates(await getCollection('updates'));
 const rendered = await Promise.all(
@@ -16,7 +16,7 @@ const rendered = await Promise.all(
       <h1>What changed</h1>
       <p class="lede">
         Every release, newest first. RealView tells you inside Studio when it has updated; this page
-        is the same list, in one place. <a href={url('rss.xml')}>Subscribe by RSS</a> or <a href={LATEST_ZIP_URL} rel="noopener">download the latest version</a>.
+        is the same list, in one place. <a href={url('rss.xml')}>Subscribe by RSS</a> or <a href={WEB_STORE_URL} rel="noopener">get it from the Chrome Web Store</a>. Every release is also on GitHub as an <a href={url('#early-access')}>early access build</a> before the store catches up.
       </p>
 
       <ol class="timeline">

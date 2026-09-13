@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
-import { LATEST_ZIP_URL, releaseUrl, url, formatDate } from '../../lib/site';
+import { WEB_STORE_URL, releaseUrl, url, formatDate } from '../../lib/site';
 
 export async function getStaticPaths() {
   const updates = await getCollection('updates');
@@ -24,8 +24,8 @@ const { Content } = await render(entry);
       <h1>{entry.data.title}</h1>
       <Content />
       <p class="actions">
-        <a class="btn primary" href={LATEST_ZIP_URL} rel="noopener">Download the latest version</a>
-        <a class="btn" href={releaseUrl(entry.data.version)} rel="noopener">This release on GitHub</a>
+        <a class="btn primary" href={WEB_STORE_URL} rel="noopener">Get it on the Chrome Web Store</a>
+        <a class="btn" href={releaseUrl(entry.data.version)} rel="noopener">Early access zip on GitHub</a>
       </p>
     </div>
   </section>

@@ -5,6 +5,7 @@ import { getCollection } from 'astro:content';
 import {
   EXTENSION_REPO,
   LATEST_ZIP_URL,
+  RELEASES_URL,
   PRIVACY_URL,
   WEB_STORE_URL,
   MIN_CHROME,
@@ -74,11 +75,11 @@ const switches = [
           ) : (
             <a class="btn primary" href={LATEST_ZIP_URL} rel="noopener">Download for Chrome</a>
           )}
-          <a class="btn" href="#install">How to install</a>
+          <a class="btn" href="#how">How it works</a>
         </div>
         <p class="fineprint muted">
           {WEB_STORE_URL
-            ? 'Also available as a zip from GitHub.'
+            ? 'Free, no account needed. Fixes land on GitHub first: see early access builds below.'
             : 'Chrome Web Store listing is under review. Until then, install from the zip in one minute.'}
           {latest && (
             <>
@@ -199,26 +200,35 @@ const switches = [
     </div>
   </section>
 
-  <section class="section" id="install">
+  <section class="section" id="early-access">
     <div class="wrap two-col">
       <div class="prose">
-        <span class="eyebrow">Install</span>
-        <h2>One minute, no build step.</h2>
+        <span class="eyebrow">Early access builds</span>
+        <h2>Get fixes before the store does.</h2>
+        <p>
+          Every release goes to <a href={RELEASES_URL} rel="noopener">GitHub</a> the moment it
+          ships. The Chrome Web Store copy follows once Google has reviewed it, which can take a
+          few days. If a fix on the <a href={url('updates/')}>updates page</a> is not in your store
+          version yet, load the zip yourself.
+        </p>
         <p class="muted">Needs Google Chrome {MIN_CHROME} or newer.</p>
         <ol class="install">
           <li>
-            <a href={LATEST_ZIP_URL} rel="noopener">Download the zip</a> and unzip it. Put the <code>RealView-extension</code> folder somewhere permanent, such as Documents. Chrome loads it from there every time it starts.
+            <a href={LATEST_ZIP_URL} rel="noopener">Download the latest zip</a> and unzip it. Put the <code>RealView-extension</code> folder somewhere permanent, such as Documents. Chrome loads it from there every time it starts.
           </li>
           <li>Open <code>chrome://extensions</code> and turn on <strong>Developer mode</strong>, top right.</li>
           <li>Click <strong>Load unpacked</strong> and choose the <code>RealView-extension</code> folder itself.</li>
           <li>
-            Open <a href="https://studio.youtube.com" rel="noopener">studio.youtube.com</a> and go to
-            Analytics. The main card now reads <strong>Engaged views</strong> and the graph is red.
+            Turn off the store copy if you have it, so the two do not run side by side. Then open
+            <a href="https://studio.youtube.com" rel="noopener">studio.youtube.com</a> and check the
+            main Analytics card reads <strong>Engaged views</strong>.
           </li>
         </ol>
         <p class="muted">
-          Chrome shows a “Disable developer mode extensions” notice at startup for any
-          extension installed this way. Dismiss it. RealView keeps working.
+          Two things to know. Chrome shows a “Disable developer mode extensions” notice at
+          startup for any extension loaded this way; dismiss it. And an unpacked build does not
+          update itself: to move to a newer version, replace the folder’s contents with the new
+          zip. The store copy updates on its own.
         </p>
       </div>
       <div class="card popup">
@@ -241,7 +251,7 @@ const switches = [
         <a class="btn primary" href={WEB_STORE_URL || LATEST_ZIP_URL} rel="noopener">
           {WEB_STORE_URL ? 'Add to Chrome' : 'Download for Chrome'}
         </a>
-        <a class="btn" href={url('updates/')}>What’s new</a>
+        <a class="btn" href="#early-access">Early access builds</a>
       </div>
     </div>
   </section>
