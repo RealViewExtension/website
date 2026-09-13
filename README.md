@@ -1,6 +1,6 @@
 # RealView website
 
-The landing page and update log for [RealView](https://github.com/ericlmao/RealViewExtension),
+The landing page and update log for [RealView](https://github.com/RealViewExtension/RealViewExtension),
 the Chrome extension that shows engaged views in YouTube Studio. Built with
 [Astro](https://astro.build) and published to GitHub Pages.
 
@@ -116,4 +116,6 @@ Things you may want to change:
 - `src/lib/site.ts`: the Chrome Web Store link and the GitHub links. The store link is the main
   install button; the GitHub release zip is offered as an early access build.
 - `src/pages/index.astro`: the landing page copy and the example figures.
+- `src/pages/privacy.md`: the privacy policy. It mirrors `PRIVACY.md` in the extension repository,
+  so update both together.
 - `src/styles/global.css`: colours and type. The red is `#ff0033`, the same as the charts.

@@ -1,0 +1,43 @@
+---
+// Wraps a markdown page in the site chrome. Used by src/pages/*.md via the
+// `layout` frontmatter key.
+import Base from './Base.astro';
+
+interface Props {
+  frontmatter: { title: string; description?: string; eyebrow?: string };
+}
+const { frontmatter } = Astro.props;
+---
+
+<Base title={frontmatter.title} description={frontmatter.description}>
+  <section class="section">
+    <div class="wrap prose page">
+      {frontmatter.eyebrow && <span class="eyebrow">{frontmatter.eyebrow}</span>}
+      <slot />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page :global(h1) {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+  .page :global(h2) {
+    font-size: 1.4rem;
+    margin-top: 2.2rem;
+  }
+  .page :global(p),
+  .page :global(li) {
+    line-height: 1.6;
+  }
+  .page :global(ul) {
+    padding-left: 1.2em;
+  }
+  .page :global(li + li) {
+    margin-top: 0.4em;
+  }
+  .page :global(.updated) {
+    color: var(--fg-muted);
+    margin-bottom: 2rem;
+  }
+</style>

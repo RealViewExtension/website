@@ -1,5 +1,5 @@
 ---
-import { EXTENSION_REPO, PRIVACY_URL, ISSUES_URL, RELEASES_URL, WEB_STORE_URL, url } from '../lib/site';
+import { EXTENSION_REPO, ISSUES_URL, RELEASES_URL, WEB_STORE_URL, url } from '../lib/site';
 const year = new Date().getFullYear();
 ---
 
@@ -17,7 +17,7 @@ const year = new Date().getFullYear();
         <a href={WEB_STORE_URL} rel="noopener">Chrome Web Store</a>
         <a href={url('updates/')}>Updates</a>
         <a href={RELEASES_URL} rel="noopener">Early access builds</a>
-        <a href={PRIVACY_URL} rel="noopener">Privacy policy</a>
+        <a href={url('privacy/')}>Privacy policy</a>
         <a href={ISSUES_URL} rel="noopener">Report a problem</a>
         <a href={EXTENSION_REPO} rel="noopener">Source on GitHub</a>
       </nav>

@@ -11,7 +11,7 @@ import { join } from 'node:path';
 
 const SOURCE =
   process.argv[2] ??
-  'https://raw.githubusercontent.com/ericlmao/RealViewExtension/main/src/changelog.json';
+  'https://raw.githubusercontent.com/RealViewExtension/RealViewExtension/main/src/changelog.json';
 const OUT_DIR = new URL('../src/content/updates/', import.meta.url);
 
 async function load() {

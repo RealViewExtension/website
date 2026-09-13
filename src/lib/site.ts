@@ -1,7 +1,7 @@
 export const SITE_NAME = 'RealView';
 export const TAGLINE = 'Engaged views for YouTube Studio';
 
-export const EXTENSION_REPO = 'https://github.com/ericlmao/RealViewExtension';
+export const EXTENSION_REPO = 'https://github.com/RealViewExtension/RealViewExtension';
 export const RELEASES_URL = `${EXTENSION_REPO}/releases`;
 export const LATEST_ZIP_URL = `${EXTENSION_REPO}/releases/latest/download/RealView-extension.zip`;
 export const PRIVACY_URL = `${EXTENSION_REPO}/blob/main/PRIVACY.md`;
