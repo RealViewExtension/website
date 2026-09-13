@@ -1,0 +1,44 @@
+---
+// "Sept 11 2026 (3d ago)". The calendar date is rendered at build time; the
+// relative part is filled in by the browser, since a static page may be days
+// old by the time it is read. Logic mirrors formatDate/relativeTime in the
+// extension's popup.js so both places agree.
+import { formatDate, isoDay } from '../lib/site';
+
+interface Props {
+  date: Date;
+}
+const { date } = Astro.props;
+---
+
+<time datetime={isoDay(date)} data-release-date>{formatDate(date)}</time>
+
+<script>
+  const MINUTE = 60 * 1000;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+
+  // How long ago a moment was, in the coarsest unit that still says something:
+  // minutes, then hours, days, weeks, months and years.
+  function relativeTime(then: number, now: number): string {
+    const elapsed = now - then;
+    if (elapsed < MINUTE) return 'just now';
+    if (elapsed < HOUR) return Math.floor(elapsed / MINUTE) + 'm ago';
+    if (elapsed < DAY) return Math.floor(elapsed / HOUR) + 'h ago';
+    const days = Math.floor(elapsed / DAY);
+    if (days < 7) return days + 'd ago';
+    if (days < 30) return Math.floor(days / 7) + 'w ago';
+    if (days < 365) return Math.floor(days / 30) + 'mo ago';
+    return Math.floor(days / 365) + 'yr ago';
+  }
+
+  // The day is taken to start at local midnight, the same calendar the reader is on.
+  const now = Date.now();
+  document.querySelectorAll<HTMLTimeElement>('time[data-release-date]').forEach((el) => {
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(el.dateTime);
+    if (!parts) return;
+    const then = new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3])).getTime();
+    if (then > now) return;
+    el.textContent += ' (' + relativeTime(then, now) + ')';
+  });
+</script>

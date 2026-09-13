@@ -1,7 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
+import ReleaseDate from '../../components/ReleaseDate.astro';
 import { getCollection, render } from 'astro:content';
-import { releaseUrl, url, formatDate, sortUpdates } from '../../lib/site';
+import { releaseUrl, url, sortUpdates } from '../../lib/site';
 
 const updates = sortUpdates(await getCollection('updates'));
 const rendered = await Promise.all(
@@ -24,7 +25,7 @@ const rendered = await Promise.all(
           <li id={entry.data.version} class="release">
             <div class="meta">
               <a class="version" href={url(`updates/${entry.data.version}/`)}>{entry.data.version}</a>
-              <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+              <ReleaseDate date={entry.data.date} />
               <span class:list={['badge', entry.data.kind]}>{entry.data.kind}</span>
             </div>
             <div class="body prose">

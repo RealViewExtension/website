@@ -29,13 +29,18 @@ export function releaseUrl(version: string): string {
   return `${EXTENSION_REPO}/releases/tag/${version}`;
 }
 
+// Same month labels the extension's popup uses, so "Sept 11 2026" reads the
+// same here and in the What's new list.
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+// "Sept 11 2026". Dates in the content files are plain calendar days, so they
+// are read in UTC to keep the day from slipping at build time.
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
+  return `${MONTHS[date.getUTCMonth()]} ${date.getUTCDate()} ${date.getUTCFullYear()}`;
+}
+
+export function isoDay(date: Date): string {
+  return date.toISOString().slice(0, 10);
 }
 
 // Newest first. Same-day releases fall back to the version number, so

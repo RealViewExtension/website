@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import StudioCard from '../components/StudioCard.astro';
+import ReleaseDate from '../components/ReleaseDate.astro';
 import { getCollection } from 'astro:content';
 import {
   EXTENSION_REPO,
@@ -10,7 +11,6 @@ import {
   WEB_STORE_URL,
   MIN_CHROME,
   url,
-  formatDate,
   sortUpdates,
 } from '../lib/site';
 
@@ -84,7 +84,7 @@ const switches = [
           {latest && (
             <>
               {' '}Latest version <a href={url('updates/')}>{latest.data.version}</a>, released{' '}
-              {formatDate(latest.data.date)}.
+              <ReleaseDate date={latest.data.date} />.
             </>
           )}
         </p>
