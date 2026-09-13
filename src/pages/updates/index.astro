@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
-import { WEB_STORE_URL, releaseUrl, url, formatDate, sortUpdates } from '../../lib/site';
+import { releaseUrl, url, formatDate, sortUpdates } from '../../lib/site';
 
 const updates = sortUpdates(await getCollection('updates'));
 const rendered = await Promise.all(
@@ -15,8 +15,8 @@ const rendered = await Promise.all(
       <span class="eyebrow">Updates</span>
       <h1>What changed</h1>
       <p class="lede">
-        Every release, newest first. RealView tells you inside Studio when it has updated; this page
-        is the same list, in one place. <a href={url('rss.xml')}>Subscribe by RSS</a> or <a href={WEB_STORE_URL} rel="noopener">get it from the Chrome Web Store</a>. Every release is also on GitHub as an <a href={url('#early-access')}>early access build</a> before the store catches up.
+        This is where every RealView changelog lives. You can also read them in the extension
+        itself: click the RealView icon in your toolbar and open “What’s new”.
       </p>
 
       <ol class="timeline">

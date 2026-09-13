@@ -25,7 +25,7 @@ title: "Short headline for this release"
 - What they will see differently, not which function changed.
 ```
 
-The updates page, each version's own page, the RSS feed and the "latest version" badge in the
+The updates page, each version's own page and the "latest version" badge in the
 header all come from these files. Nothing else needs editing.
 
 To pull entries straight from the extension's `src/changelog.json`:
