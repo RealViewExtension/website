@@ -1,8 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import StudioCard from '../components/StudioCard.astro';
-import ReleaseDate from '../components/ReleaseDate.astro';
-import { getCollection } from 'astro:content';
 import {
   EXTENSION_REPO,
   LATEST_ZIP_URL,
@@ -11,11 +9,8 @@ import {
   WEB_STORE_URL,
   MIN_CHROME,
   url,
-  sortUpdates,
 } from '../lib/site';
 
-const updates = sortUpdates(await getCollection('updates'));
-const latest = updates[0];
 
 const covers = [
   {
@@ -79,14 +74,8 @@ const switches = [
         </div>
         <p class="fineprint muted">
           {WEB_STORE_URL
-            ? 'Free, no account needed. Fixes land on GitHub first: see early access builds below.'
+            ? 'Free, no account needed.'
             : 'Chrome Web Store listing is under review. Until then, install from the zip in one minute.'}
-          {latest && (
-            <>
-              {' '}Latest version <a href={url('updates/')}>{latest.data.version}</a>, released{' '}
-              <ReleaseDate date={latest.data.date} />.
-            </>
-          )}
         </p>
       </div>
       <div class="hero-demo" aria-label="Studio's Views card before and after RealView">
