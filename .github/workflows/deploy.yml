@@ -1,17 +1,22 @@
 # Builds and publishes the site to GitHub Pages.
 #
-#   main branch     -> https://tryrealview.com/          (from public/CNAME)
-#   staging branch  -> https://tryrealview.com/staging/
-#
-# Without a public/CNAME file the site falls back to
-# https://<owner>.github.io/<repo>/ and /staging/ under it.
+#   staging branch  -> https://tryrealview.com/staging/   deploys on push
+#   main branch     -> https://tryrealview.com/           deploys after approval
 #
 # GitHub Pages serves one site per repository, so both live in the same
-# deployment: every run rebuilds production from `main` and staging from
-# `staging`, then publishes the two together. Pushing to either branch is
-# enough. Staging pages carry a noindex tag and a banner.
+# deployment. The `production` branch marks the last approved commit of
+# `main`: every run builds production from it and staging from `staging`,
+# then publishes the two together.
 #
-# One-time setup: Settings -> Pages -> Source: "GitHub Actions".
+# A push to `main` first runs the `promote` job, which is bound to the
+# `production` environment. That environment requires a reviewer, so the
+# run pauses under Actions with a "Review deployments" button. Approving
+# fast-forwards `production` to the pushed commit and the deploy goes
+# ahead; rejecting leaves the live site as it was. A push to `staging`
+# skips the gate and deploys straight away.
+#
+# One-time setup: Settings -> Pages -> Source: "GitHub Actions", and
+# Settings -> Environments -> production -> Required reviewers.
 
 name: Deploy to GitHub Pages
 
@@ -25,25 +30,49 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 env:
   NODE_VERSION: 22
 
 jobs:
-  build:
-    name: Build production + staging
+  promote:
+    name: Approve production
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    outputs:
-      site_url: ${{ steps.paths.outputs.site_url }}
-      base_path: ${{ steps.paths.outputs.base_path }}
+    environment:
+      name: production
+      url: https://tryrealview.com/
+    permissions:
+      contents: write
     steps:
       - name: Check out main
         uses: actions/checkout@v7
         with:
           ref: main
+          fetch-depth: 0
+
+      - name: Fast-forward the production branch to this commit
+        run: |
+          git push origin "${GITHUB_SHA}:refs/heads/production"
+          echo "production is now ${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    name: Build production + staging
+    needs: promote
+    # Run when promote succeeded (approved main push) or was skipped
+    # (staging push). A rejected approval fails promote and stops here.
+    if: always() && (needs.promote.result == 'success' || needs.promote.result == 'skipped')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages-build
+      cancel-in-progress: false
+    outputs:
+      site_url: ${{ steps.paths.outputs.site_url }}
+      base_path: ${{ steps.paths.outputs.base_path }}
+    steps:
+      - name: Check out production
+        uses: actions/checkout@v7
+        with:
+          ref: production
           path: main
 
       - name: Work out the Pages URL for this repository
@@ -97,7 +126,7 @@ jobs:
           cache: npm
           cache-dependency-path: main/package-lock.json
 
-      - name: Build production (main)
+      - name: Build production (production branch)
         working-directory: main
         env:
           SITE_URL: ${{ steps.paths.outputs.site_url }}
@@ -107,7 +136,7 @@ jobs:
           npm ci
           npm run build
 
-      - name: Build staging (staging)
+      - name: Build staging (staging branch)
         if: steps.staging.outputs.exists == 'true'
         working-directory: staging
         env:
@@ -128,7 +157,11 @@ jobs:
   deploy:
     name: Publish
     needs: build
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -147,6 +180,6 @@ jobs:
             echo
             echo "| Environment | URL |"
             echo "| --- | --- |"
-            echo "| Production (main) | ${site}/ |"
-            echo "| Staging (staging) | ${site}/staging/ |"
+            echo "| Production (production branch) | ${site}/ |"
+            echo "| Staging (staging branch) | ${site}/staging/ |"
           } >> "$GITHUB_STEP_SUMMARY"

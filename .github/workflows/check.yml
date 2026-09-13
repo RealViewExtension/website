@@ -6,7 +6,7 @@ name: Check
 on:
   pull_request:
   push:
-    branches-ignore: [main, staging]
+    branches-ignore: [main, staging, production]
 
 permissions:
   contents: read

@@ -50,13 +50,31 @@ so open the new file and give it a better title before committing.
    git push origin my-branch:staging --force
    ```
 
-   The **Deploy** workflow publishes it under `/staging/` within a couple of minutes. Staging
-   pages carry a striped banner and a `noindex` tag, so search engines ignore them.
-3. Happy with it? Merge to `main`. The same workflow publishes it to the production URL.
+   The **Deploy** workflow publishes it under `/staging/` within a couple of minutes, with no
+   approval needed. Staging pages carry a striped banner and a `noindex` tag, so search engines
+   ignore them.
+3. Happy with it? Merge to `main` and approve the production deploy (below).
 
-Both environments are rebuilt on every run, so staging is always the head of the `staging` branch
-and production is always the head of `main`. To retire staging, delete the branch; the next
-production deploy drops the `/staging/` folder.
+## Deploying to production
+
+Production only changes when you say so. A push to `main` starts a Deploy run that pauses at the
+**Approve production** job:
+
+1. Open the run under **Actions** (or follow the email GitHub sends).
+2. Click **Review deployments**, tick `production`, and click **Approve and deploy**.
+
+Approving fast-forwards the `production` branch to that commit and publishes it. Rejecting, or
+just leaving it, keeps the live site exactly as it was; staging pushes in the meantime still go
+out on their own. The `production` branch is a marker of what is live: never push to it by hand.
+
+## Rolling back
+
+Approve an older commit. Find the Deploy run for the version you want under **Actions**, click
+**Re-run all jobs**, and approve it. Or reset `production` and re-run any Deploy run:
+
+```sh
+git push origin <good-commit>:production --force
+```
 
 ## One-time GitHub setup
 
@@ -67,8 +85,23 @@ production deploy drops the `/staging/` folder.
    ```sh
    gh api -X POST repos/RealViewExtension/website/pages -f build_type=workflow
    ```
-3. Push `main`. The first run creates the `github-pages` environment and publishes the site.
-4. Allow the `staging` branch to deploy. GitHub creates the environment with a branch policy
+3. Create the `production` branch from `main` and protect it with a reviewer:
+
+   ```sh
+   git push origin main:production
+   gh api -X PUT repos/RealViewExtension/website/environments/production \
+     --input - <<'JSON'
+   {"reviewers":[{"type":"User","id":<your user id>}],
+    "deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}
+   JSON
+   gh api -X POST repos/RealViewExtension/website/environments/production/deployment-branch-policies \
+     -f name=main -f type=branch
+   ```
+
+   Or Settings → Environments → New environment → `production` → tick **Required reviewers** and
+   add yourself → Deployment branches: `main` only.
+4. Push `main`. The first run creates the `github-pages` environment and publishes the site.
+5. Allow the `staging` branch to deploy. GitHub creates the environment with a branch policy
    that only permits `main`, so the first staging run fails at the Publish step until you add it:
 
    ```sh
