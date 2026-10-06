@@ -7,7 +7,7 @@ description: RealView collects nothing, transmits nothing to its developer, and 
 
 # Privacy policy
 
-<p class="updated">Last updated: 11 September 2026</p>
+<p class="updated">Last updated: 6 October 2026</p>
 
 RealView is a Chrome extension that changes which view metric YouTube Studio
 displays. This page describes everything it does with data.
@@ -41,16 +41,17 @@ developer of this extension or to any third party.
 
 ## What it stores
 
-RealView stores four settings, the ones shown in its toolbar popup:
+RealView stores five settings, the ones shown in its toolbar popup:
 
 - whether to show engaged views
 - whether to colour the charts red
+- whether to show the Top recent videos card on the dashboard
 - whether to show the update notice in Studio
 - whether to write diagnostic messages to the browser console
 
 They are stored with the Chrome `storage.sync` API, which is what Chrome
 provides for keeping a user's settings across the browsers they are signed into.
-If you have Chrome sync switched on, Chrome carries these four settings to your
+If you have Chrome sync switched on, Chrome carries these five settings to your
 other Chrome profiles, in the same way it carries your bookmarks. That transfer
 is between you and Chrome. The developer of this extension cannot see it.
 
