@@ -22,7 +22,7 @@ const covers = [
   },
   {
     title: 'Dashboard',
-    text: 'The channel summary card, top content, and the latest-video card with its “6 of 10” ranking rebuilt and reordered by engaged views.',
+    text: 'The channel summary card, top content, the latest-video card with its “6 of 10” ranking rebuilt and reordered by engaged views, and a Top recent videos card that lists that ranking in full.',
   },
   {
     title: 'Content tab',
@@ -47,6 +47,7 @@ const ranges = [
 const switches = [
   ['Use engaged views', 'The main switch. Off, and Studio behaves exactly as it normally does.'],
   ['Red charts', 'Chart colour. Only applies while engaged views are being shown.'],
+  ['Top recent videos on the dashboard', 'A card listing the ten videos your latest upload is ranked against. Handy on a phone, where the ranking panel will not open.'],
   ['Update notice on Studio', 'The small card that appears once after an update. Off, and only the toolbar badge tells you.'],
   ['Log to the console', 'For diagnosing a problem. Leave it off for normal use.'],
 ];
@@ -172,7 +173,7 @@ const switches = [
         <h2>Nothing leaves your browser.</h2>
         <p>
           RealView runs only on <code>studio.youtube.com</code> and asks for a single permission:
-          storage, to remember its four switches. The engaged figures are held in memory and never
+          storage, to remember its five switches. The engaged figures are held in memory and never
           written to disk. No servers, no accounts, no analytics of its own.
         </p>
         <p>
@@ -224,11 +225,11 @@ const switches = [
         </p>
       </div>
       <div class="card popup">
-        <h3>Four switches</h3>
+        <h3>Five switches</h3>
         <p class="muted small">Click the RealView icon in the toolbar.</p>
         {switches.map(([name, text], i) => (
           <label class="switch">
-            <input type="checkbox" checked={i < 3} disabled />
+            <input type="checkbox" checked={i < 4} disabled />
             <span><strong>{name}</strong><span class="muted">{text}</span></span>
           </label>
         ))}
